@@ -1,0 +1,70 @@
+@import "tailwindcss";
+
+@theme {
+  --color-navy: #10263D;
+  --color-byte-orange: #F28C18;
+  --color-warm-orange: #FF9F1C;
+  --color-cream: #FFF8ED;
+  --color-fresh-green: #5B8C3A;
+  --color-gold: #D9A441;
+  --color-background: var(--color-cream);
+  --color-foreground: var(--color-navy);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@layer utilities {
+  .clay-card {
+    background: #ffffff;
+    border-radius: 1.5rem;
+    box-shadow: 8px 8px 16px #e3dacd, -8px -8px 16px #ffffff;
+  }
+  .clay-btn {
+    background: var(--color-byte-orange);
+    border-radius: 1rem;
+    box-shadow: inset 2px 2px 4px rgba(255,255,255,0.4), inset -2px -2px 4px rgba(0,0,0,0.1), 4px 4px 8px #e3dacd, -4px -4px 8px #ffffff;
+    color: white;
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+  .clay-btn:active {
+    box-shadow: inset 4px 4px 8px rgba(0,0,0,0.2), inset -2px -2px 4px rgba(255,255,255,0.4);
+    transform: translateY(2px);
+  }
+  .clay-btn-secondary {
+    background: #ffffff;
+    border-radius: 1rem;
+    box-shadow: inset 2px 2px 4px rgba(255,255,255,1), inset -2px -2px 4px rgba(0,0,0,0.05), 4px 4px 8px #e3dacd, -4px -4px 8px #ffffff;
+    color: var(--color-navy);
+    font-weight: 600;
+    transition: all 0.2s ease;
+  }
+  .clay-btn-secondary:active {
+    box-shadow: inset 4px 4px 8px rgba(0,0,0,0.1), inset -2px -2px 4px rgba(255,255,255,1);
+    transform: translateY(2px);
+  }
+  
+  .neumorphic-input {
+    background: #ffffff;
+    border-radius: 1rem;
+    box-shadow: inset 4px 4px 8px #e3dacd, inset -4px -4px 8px #ffffff;
+    border: none;
+    outline: none;
+  }
+  
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-navy);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
