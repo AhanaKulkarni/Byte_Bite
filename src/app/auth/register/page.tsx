@@ -32,8 +32,8 @@ export default function RegisterPage() {
         return;
       }
 
-      // Use phone as a pseudo-email for Supabase Auth
-      const pseudoEmail = `${phone}@byteandbite.app`;
+      // Use phone as a pseudo-email for Supabase Auth to avoid needing paid Twilio SMS
+      const pseudoEmail = `user_${phone}@byteandbite.com`;
 
       // 1. Sign up user
       const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -41,7 +41,14 @@ export default function RegisterPage() {
         password: password,
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        // Sanitize error message to hide the pseudo-email implementation
+        let msg = authError.message;
+        if (msg.includes('Email address') || msg.includes('email')) {
+          msg = 'Invalid phone number format or account already exists.';
+        }
+        throw new Error(msg);
+      }
 
       // 2. Add extra data to public.users table
       if (authData.user) {

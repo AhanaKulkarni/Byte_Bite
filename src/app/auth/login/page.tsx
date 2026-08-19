@@ -37,15 +37,20 @@ export default function LoginPage() {
         return;
       }
 
-      // Use phone as a pseudo-email for Supabase Auth
-      const pseudoEmail = `${phone}@byteandbite.app`;
-      
+      // Use phone as a pseudo-email for Supabase Auth to avoid needing paid Twilio SMS
+      const pseudoEmail = `user_${phone}@byteandbite.com`;
       const { data, error: authError } = await supabase.auth.signInWithPassword({
         email: pseudoEmail,
-        password: password,
+        password,
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        let msg = authError.message;
+        if (msg.includes('Email') || msg.includes('email') || msg.includes('login credentials')) {
+          msg = 'Invalid phone number or password.';
+        }
+        throw new Error(msg);
+      }
 
       // Check if user exists in the public.users table
       if (data.user) {
