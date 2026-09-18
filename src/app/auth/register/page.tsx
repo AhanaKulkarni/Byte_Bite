@@ -7,11 +7,12 @@ import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Lock, Phone, User, GraduationCap } from 'lucide-react';
+import { Lock, Phone, User, GraduationCap, Mail } from 'lucide-react';
 
 export default function RegisterPage() {
   const router = useRouter();
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [college, setCollege] = useState('');
@@ -32,29 +33,19 @@ export default function RegisterPage() {
         return;
       }
 
-      // Use phone as a pseudo-email for Supabase Auth to avoid needing paid Twilio SMS
-      const pseudoEmail = `user_${phone}@byteandbite.com`;
-
-      // 1. Sign up user
+      // 1. Sign up user via Email
       const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: pseudoEmail,
+        email: email,
         password: password,
       });
 
-      if (authError) {
-        // Sanitize error message to hide the pseudo-email implementation
-        let msg = authError.message;
-        if (msg.includes('Email address') || msg.includes('email')) {
-          msg = 'Invalid phone number format or account already exists.';
-        }
-        throw new Error(msg);
-      }
+      if (authError) throw authError;
 
-      // 2. Add extra data to public.users table
+      // 2. Add extra data (including phone) to public.users table
       if (authData.user) {
         const { error: dbError } = await supabase.from('users').insert({
           id: authData.user.id,
-          phone_number: `+91${phone}`,
+          phone_number: phone,
           full_name: name,
           college: college,
           role: 'student'
@@ -66,11 +57,7 @@ export default function RegisterPage() {
       // Success, redirect to home
       router.push('/');
     } catch (err: any) {
-      if (err.message.includes('User already registered')) {
-        setError('This phone number is already registered.');
-      } else {
-        setError(err.message || 'Failed to complete registration');
-      }
+      setError(err.message || 'Failed to complete registration');
     } finally {
       setLoading(false);
     }
@@ -106,6 +93,21 @@ export default function RegisterPage() {
                     className="pl-12 h-14 bg-gray-50"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-[var(--color-navy)] mb-2">Email Address</label>
+                <div className="relative">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Input 
+                    type="email" 
+                    placeholder="student@college.edu" 
+                    className="pl-12 h-14 bg-gray-50"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
@@ -162,7 +164,7 @@ export default function RegisterPage() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full h-14 text-lg font-bold mt-4" disabled={loading || phone.length !== 10 || !password || !name || !college}>
+            <Button type="submit" className="w-full h-14 text-lg font-bold mt-4" disabled={loading || phone.length !== 10 || !password || !name || !college || !email}>
               {loading ? 'Creating account...' : 'Sign Up'}
             </Button>
             

@@ -7,11 +7,11 @@ import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
-import { Lock, Phone } from 'lucide-react';
+import { Lock, Mail } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
-  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -19,62 +19,48 @@ export default function LoginPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
-    // DEMO ADMIN BYPASS LOGIC
-    if (phone === '8928352406' && password === 'admin@123') {
-      localStorage.setItem('demo_admin', 'true');
-      router.push('/admin');
-      return;
-    }
-
     setLoading(true);
+
     try {
       // DEMO LOCALHOST BYPASS
       if (!process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder')) {
         console.log("No real Supabase credentials found, bypassing login for local demo.");
-        localStorage.setItem('demo_student', JSON.stringify({ name: 'Demo Student', phone, college: 'TCET' }));
-        setTimeout(() => router.push('/'), 500);
+        if (email === 'admin@byteandbite.com' && password === 'admin@123') {
+          localStorage.setItem('demo_admin', 'true');
+          setTimeout(() => router.push('/admin'), 500);
+        } else {
+          localStorage.setItem('demo_student', JSON.stringify({ name: 'Demo Student', email, college: 'TCET' }));
+          setTimeout(() => router.push('/'), 500);
+        }
         return;
       }
 
-      // Use phone as a pseudo-email for Supabase Auth to avoid needing paid Twilio SMS
-      const pseudoEmail = `user_${phone}@byteandbite.com`;
+      // Native Supabase Email Auth
       const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email: pseudoEmail,
+        email,
         password,
       });
 
       if (authError) {
-        let msg = authError.message;
-        if (msg.includes('Email') || msg.includes('email') || msg.includes('login credentials')) {
-          msg = 'Invalid phone number or password.';
-        }
-        throw new Error(msg);
+        throw new Error(authError.message);
       }
 
       // Check if user exists in the public.users table
       if (data.user) {
-        const { data: profile } = await supabase
+        const { data: userData, error: dbError } = await supabase
           .from('users')
-          .select('*')
+          .select('role')
           .eq('id', data.user.id)
           .single();
           
-        if (!profile) {
-          // Rare edge case: Auth exists but profile doesn't. 
-          // Let's force them to register again or handle it.
-          throw new Error("Profile not found. Please register again.");
+        if (userData?.role === 'admin') {
+          router.push('/admin');
+        } else {
+          router.push('/');
         }
       }
-
-      router.push('/');
-      
     } catch (err: any) {
-      if (err.message === 'Invalid login credentials') {
-        setError('Invalid phone number or password.');
-      } else {
-        setError(err.message || 'Failed to login');
-      }
+      setError(err.message || 'Invalid email or password');
     } finally {
       setLoading(false);
     }
@@ -85,9 +71,9 @@ export default function LoginPage() {
       <Card className="w-full max-w-md shadow-2xl shadow-orange-100/50 border-white">
         <CardHeader className="text-center mb-6 pt-8">
           <CardTitle className="text-3xl text-[var(--color-byte-orange)] font-black tracking-tight">
-            Byte & Bite
+            Welcome Back
           </CardTitle>
-          <p className="text-gray-500 font-medium mt-2">Campus Snack Café</p>
+          <p className="text-gray-500 font-medium mt-2">Login to Byte & Bite</p>
         </CardHeader>
         
         <CardContent className="pb-8">
@@ -100,15 +86,15 @@ export default function LoginPage() {
           <form onSubmit={handleLogin} className="space-y-5">
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-bold text-[var(--color-navy)] mb-2">Phone Number</label>
+                <label className="block text-sm font-bold text-[var(--color-navy)] mb-2">Email Address</label>
                 <div className="relative">
-                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <Input 
-                    type="tel" 
-                    placeholder="Enter your 10-digit number" 
+                    type="email" 
+                    placeholder="student@college.edu" 
                     className="pl-12 h-14 bg-gray-50"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value.replace(/\D/g, '').slice(0, 10))}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                   />
                 </div>
@@ -130,7 +116,7 @@ export default function LoginPage() {
               </div>
             </div>
 
-            <Button type="submit" className="w-full h-14 text-lg font-bold mt-4" disabled={loading || phone.length !== 10 || !password}>
+            <Button type="submit" className="w-full h-14 text-lg font-bold mt-4" disabled={loading || !email || !password}>
               {loading ? 'Logging in...' : 'Login'}
             </Button>
             
@@ -138,7 +124,7 @@ export default function LoginPage() {
               <p className="text-gray-500 text-sm font-medium">
                 Don't have an account?{' '}
                 <Link href="/auth/register" className="text-[var(--color-byte-orange)] font-bold hover:underline">
-                  Register here
+                  Sign up here
                 </Link>
               </p>
             </div>
@@ -148,4 +134,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
