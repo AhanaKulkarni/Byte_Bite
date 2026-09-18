@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ArrowLeft, Clock, Info } from 'lucide-react';
+import { ArrowLeft, Clock, Info, Minus, Plus, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
+import { useCart } from '@/lib/CartContext';
 
 const PICKUP_TIMES = [
   'ASAP',
@@ -22,10 +23,9 @@ export default function CartPage() {
   const router = useRouter();
   const [selectedTime, setSelectedTime] = useState<string>('ASAP');
   const [isLoading, setIsLoading] = useState(false);
-  const [cartItems, setCartItems] = useState<any[]>([]); // Real client cart would load from context/store
+  const { items: cartItems, subtotal, updateQuantity, removeItem } = useCart();
 
-  const subtotal = cartItems.reduce((acc, item) => acc + (item.price * item.quantity), 0);
-  const discount = cartItems.length > 0 ? 10 : 0;
+  const discount = cartItems.length > 0 ? 0 : 0; // Removing fake discount
   const total = subtotal - discount;
 
   const handleCheckout = () => {
@@ -49,8 +49,15 @@ export default function CartPage() {
 
       <div className="max-w-4xl mx-auto p-4 md:p-8 md:pt-8 space-y-6 md:space-y-8">
         {cartItems.length === 0 ? (
-          <div className="text-center py-20 text-gray-500 bg-white rounded-3xl border border-gray-100 shadow-sm">
-            Your cart is empty.
+          <div className="text-center py-20 text-gray-500 bg-white rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center">
+            <div className="text-4xl mb-4">🛒</div>
+            <p className="font-bold text-lg text-[var(--color-navy)]">Your cart is empty.</p>
+            <p className="text-sm mt-1">Looks like you haven't added any Momos yet!</p>
+            <Link href="/">
+              <Button className="mt-6 bg-[var(--color-byte-orange)] hover:bg-orange-600 text-white rounded-xl">
+                Browse Menu
+              </Button>
+            </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-[1fr_350px] gap-6 md:gap-8 items-start">
@@ -61,13 +68,36 @@ export default function CartPage() {
                   <div className="divide-y divide-gray-100">
                     {cartItems.map((item) => (
                       <div key={item.id} className="p-4 md:p-6 flex items-center justify-between bg-white hover:bg-gray-50 transition-colors">
-                        <div>
-                          <h3 className="font-bold text-base md:text-lg text-[var(--color-navy)]">{item.name}</h3>
-                          <p className="text-xs md:text-sm text-gray-500">{item.stall}</p>
+                        <div className="flex-1">
+                          <h3 className="font-bold text-base md:text-lg text-[var(--color-navy)] flex items-center gap-2">
+                            {item.name}
+                            {item.variantName && (
+                              <span className="bg-orange-100 text-[var(--color-byte-orange)] text-[10px] px-2 py-0.5 rounded-full font-black uppercase tracking-wider">
+                                {item.variantName}
+                              </span>
+                            )}
+                          </h3>
+                          <div className="text-sm font-bold text-[var(--color-navy)] mt-1">₹{item.price}</div>
                         </div>
                         <div className="flex items-center gap-4">
-                          <span className="text-sm md:text-base font-semibold text-gray-500">× {item.quantity}</span>
-                          <span className="font-bold text-base md:text-lg text-[var(--color-navy)] w-16 text-right">₹{item.price * item.quantity}</span>
+                          <div className="flex items-center gap-3 bg-gray-100 rounded-xl p-1 border border-gray-200">
+                            <button 
+                              onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                              className="w-7 h-7 flex items-center justify-center rounded-lg bg-white shadow-sm text-gray-600 active:scale-95 transition-transform"
+                            >
+                              {item.quantity === 1 ? <Trash2 className="w-3.5 h-3.5 text-red-500" /> : <Minus className="w-3.5 h-3.5" />}
+                            </button>
+                            <span className="text-sm font-bold w-4 text-center text-[var(--color-navy)]">{item.quantity}</span>
+                            <button 
+                              onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                              className="w-7 h-7 flex items-center justify-center rounded-lg bg-white shadow-sm text-[var(--color-byte-orange)] active:scale-95 transition-transform"
+                            >
+                              <Plus className="w-3.5 h-3.5 font-bold" />
+                            </button>
+                          </div>
+                          <span className="font-black text-base md:text-lg text-[var(--color-navy)] w-16 text-right">
+                            ₹{item.price * item.quantity}
+                          </span>
                         </div>
                       </div>
                     ))}

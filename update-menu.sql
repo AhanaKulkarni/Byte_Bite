@@ -1,11 +1,15 @@
 -- Byte & Bite Menu Setup Script (Full Actual Menu with Variants)
 -- Run this in your Supabase SQL Editor
 
--- 1. Add variants column if it doesn't exist (safe to run multiple times)
+-- 1. Add missing columns if they don't exist (safe to run multiple times)
 DO $$ 
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'menu_items' AND column_name = 'variants') THEN
     ALTER TABLE public.menu_items ADD COLUMN variants JSONB DEFAULT NULL;
+  END IF;
+  
+  IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'menu_items' AND column_name = 'is_veg') THEN
+    ALTER TABLE public.menu_items ADD COLUMN is_veg BOOLEAN DEFAULT true;
   END IF;
 END $$;
 

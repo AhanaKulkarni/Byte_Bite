@@ -22,6 +22,8 @@ export const metadata: Metadata = {
   viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0',
 };
 
+import { CartProvider } from '@/lib/CartContext';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -32,10 +34,12 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-gray-50 flex flex-col md:flex-row`}
       >
-        <ResponsiveNav />
-        <MainWrapper>
-          {children}
-        </MainWrapper>
+        <CartProvider>
+          <ResponsiveNav />
+          <MainWrapper>
+            {children}
+          </MainWrapper>
+        </CartProvider>
       </body>
     </html>
   );

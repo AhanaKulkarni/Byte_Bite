@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { ArrowLeft, Search, ShoppingBag } from 'lucide-react';
 import { MenuCard } from '@/components/MenuCard';
 import { supabase } from '@/lib/supabase';
+import { useCart } from '@/lib/CartContext';
 
 export default function StallMenuPage({ params }: { params: Promise<{ stallId: string }> }) {
   const resolvedParams = use(params);
@@ -12,6 +13,8 @@ export default function StallMenuPage({ params }: { params: Promise<{ stallId: s
   const [activeCategory, setActiveCategory] = useState('All');
   const [menuItems, setMenuItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  const { addItem, totalItems } = useCart();
   
   useEffect(() => {
     const fetchMenu = async () => {
@@ -37,7 +40,7 @@ export default function StallMenuPage({ params }: { params: Promise<{ stallId: s
     : menuItems.filter(i => i.category === activeCategory);
 
   const handleAdd = (item: any, quantity: number, variant?: any) => {
-    console.log('Added to cart:', item.name, quantity, variant ? variant.name : '');
+    addItem(item, quantity, variant);
   };
 
   return (
@@ -55,7 +58,11 @@ export default function StallMenuPage({ params }: { params: Promise<{ stallId: s
           </div>
           <Link href="/cart" className="p-2 -mr-2 rounded-full hover:bg-gray-100 relative transition-colors">
             <ShoppingBag className="w-5 h-5 md:w-6 md:h-6 text-[var(--color-navy)]" />
-            <span className="absolute top-1.5 right-1.5 w-2.5 h-2.5 bg-[var(--color-byte-orange)] rounded-full border-2 border-white" />
+            {totalItems > 0 && (
+              <span className="absolute top-1 right-1 w-4 h-4 flex items-center justify-center bg-[var(--color-byte-orange)] text-white text-[9px] font-bold rounded-full border-2 border-white shadow-sm">
+                {totalItems}
+              </span>
+            )}
           </Link>
         </div>
         
