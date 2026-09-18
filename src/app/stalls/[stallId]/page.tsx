@@ -18,7 +18,7 @@ export default function StallMenuPage({ params }: { params: Promise<{ stallId: s
       try {
         const { data } = await supabase
           .from('menu_items')
-          .select('*')
+          .select('id, name, description, price, image_url, is_available, category, is_veg, variants')
           .eq('stall_id', resolvedParams.stallId);
         if (data) setMenuItems(data);
       } catch (e) {
@@ -36,8 +36,8 @@ export default function StallMenuPage({ params }: { params: Promise<{ stallId: s
     ? menuItems 
     : menuItems.filter(i => i.category === activeCategory);
 
-  const handleAdd = (item: any, quantity: number) => {
-    console.log('Added to cart:', item.name, quantity);
+  const handleAdd = (item: any, quantity: number, variant?: any) => {
+    console.log('Added to cart:', item.name, quantity, variant ? variant.name : '');
   };
 
   return (
@@ -90,7 +90,7 @@ export default function StallMenuPage({ params }: { params: Promise<{ stallId: s
                 <div key={item.id} className="h-full">
                   <MenuCard 
                     item={item} 
-                    onAdd={(qty) => handleAdd(item, qty)} 
+                    onAdd={(qty, variant) => handleAdd(item, qty, variant)} 
                   />
                 </div>
               ))}

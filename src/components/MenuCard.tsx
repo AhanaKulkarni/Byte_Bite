@@ -5,25 +5,39 @@ import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { Minus, Plus } from 'lucide-react';
 
+interface Variant {
+  name: string;
+  price: number;
+}
+
 interface MenuCardProps {
   item: {
     id: string;
     name: string;
-    description: string;
+    description?: string;
     price: number;
     image_url?: string;
     is_available: boolean;
     category?: string;
     is_veg?: boolean;
+    variants?: Variant[] | null;
   };
-  onAdd: (quantity: number) => void;
+  onAdd: (quantity: number, variant?: Variant) => void;
 }
 
 export function MenuCard({ item, onAdd }: MenuCardProps) {
   const [quantity, setQuantity] = useState(1);
+  const hasVariants = item.variants && item.variants.length > 0;
+  
+  // Default to the first variant if they exist
+  const [selectedVariant, setSelectedVariant] = useState<Variant | undefined>(
+    hasVariants ? item.variants![0] : undefined
+  );
+
+  const currentPrice = selectedVariant ? selectedVariant.price : item.price;
 
   const handleAdd = () => {
-    onAdd(quantity);
+    onAdd(quantity, selectedVariant);
     setQuantity(1); // Reset after adding
   };
 
@@ -33,7 +47,7 @@ export function MenuCard({ item, onAdd }: MenuCardProps) {
 
   return (
     <Card 
-      className={`relative overflow-hidden transition-all ${
+      className={`relative overflow-hidden transition-all h-full ${
         !item.is_available ? 'opacity-60' : ''
       } ${
         isSignature ? 'border-[var(--color-byte-orange)] shadow-orange-100 shadow-md' : 
@@ -57,7 +71,9 @@ export function MenuCard({ item, onAdd }: MenuCardProps) {
           ) : (
             <div className="w-full h-full flex items-center justify-center text-3xl">
               {item.name.toLowerCase().includes('fries') ? '🍟' : 
-               item.name.toLowerCase().includes('combo') ? '🍱' : '🥟'}
+               item.name.toLowerCase().includes('burger') ? '🍔' : 
+               item.name.toLowerCase().includes('pancake') ? '🥞' : 
+               item.name.toLowerCase().includes('waffle') ? '🧇' : '🥟'}
             </div>
           )}
           {!item.is_available && (
@@ -82,40 +98,63 @@ export function MenuCard({ item, onAdd }: MenuCardProps) {
             <h3 className={`font-black leading-tight mb-1 ${isSignature ? 'text-[var(--color-byte-orange)] text-lg' : 'text-[var(--color-navy)] text-base'}`}>
               {item.name}
             </h3>
-            <p className="text-xs text-gray-500 line-clamp-2 font-medium leading-relaxed">{item.description}</p>
+            {item.description && (
+              <p className="text-xs text-gray-500 line-clamp-2 font-medium leading-relaxed">{item.description}</p>
+            )}
           </div>
           
-          <div className="flex items-end justify-between mt-3">
-            <span className="font-black text-xl text-[var(--color-navy)] tracking-tight">₹{item.price}</span>
-            
-            {item.is_available ? (
-              <div className="flex flex-col items-end gap-2">
-                <div className="flex items-center gap-3 bg-gray-100 rounded-xl p-1 border border-gray-200">
-                  <button 
-                    onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="w-6 h-6 flex items-center justify-center rounded-lg bg-white shadow-sm text-gray-600 active:scale-95 transition-transform"
+          <div className="flex flex-col mt-2 gap-3">
+            {/* Variant Selector */}
+            {hasVariants && (
+              <div className="flex bg-gray-100 p-0.5 rounded-lg w-full">
+                {item.variants!.map((variant, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setSelectedVariant(variant)}
+                    className={`flex-1 text-[10px] font-bold py-1.5 rounded-md transition-all ${
+                      selectedVariant?.name === variant.name 
+                        ? 'bg-white text-[var(--color-navy)] shadow-sm' 
+                        : 'text-gray-500 hover:text-gray-700'
+                    }`}
                   >
-                    <Minus className="w-3 h-3" />
+                    {variant.name}
                   </button>
-                  <span className="text-sm font-bold w-3 text-center text-[var(--color-navy)]">{quantity}</span>
-                  <button 
-                    onClick={() => setQuantity(quantity + 1)}
-                    className="w-6 h-6 flex items-center justify-center rounded-lg bg-white shadow-sm text-[var(--color-byte-orange)] active:scale-95 transition-transform"
-                  >
-                    <Plus className="w-3 h-3 font-bold" />
-                  </button>
-                </div>
-                <Button size="sm" onClick={handleAdd} className={`h-8 px-4 text-xs font-bold w-full rounded-xl transition-transform active:scale-95 ${
-                  isSpecial ? (isSignature ? 'bg-[var(--color-byte-orange)] text-white hover:bg-orange-600' : 'bg-yellow-500 text-white hover:bg-yellow-600') : ''
-                }`}>
-                  ADD
-                </Button>
+                ))}
               </div>
-            ) : (
-              <Button size="sm" variant="secondary" disabled className="h-8 px-4 text-xs rounded-xl font-bold bg-gray-100 text-gray-400">
-                Unavailable
-              </Button>
             )}
+
+            <div className="flex items-end justify-between">
+              <span className="font-black text-xl text-[var(--color-navy)] tracking-tight">₹{currentPrice}</span>
+              
+              {item.is_available ? (
+                <div className="flex flex-col items-end gap-2">
+                  <div className="flex items-center gap-3 bg-gray-100 rounded-xl p-1 border border-gray-200">
+                    <button 
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      className="w-6 h-6 flex items-center justify-center rounded-lg bg-white shadow-sm text-gray-600 active:scale-95 transition-transform"
+                    >
+                      <Minus className="w-3 h-3" />
+                    </button>
+                    <span className="text-sm font-bold w-3 text-center text-[var(--color-navy)]">{quantity}</span>
+                    <button 
+                      onClick={() => setQuantity(quantity + 1)}
+                      className="w-6 h-6 flex items-center justify-center rounded-lg bg-white shadow-sm text-[var(--color-byte-orange)] active:scale-95 transition-transform"
+                    >
+                      <Plus className="w-3 h-3 font-bold" />
+                    </button>
+                  </div>
+                  <Button size="sm" onClick={handleAdd} className={`h-8 px-4 text-xs font-bold w-full rounded-xl transition-transform active:scale-95 ${
+                    isSpecial ? (isSignature ? 'bg-[var(--color-byte-orange)] text-white hover:bg-orange-600' : 'bg-yellow-500 text-white hover:bg-yellow-600') : ''
+                  }`}>
+                    ADD
+                  </Button>
+                </div>
+              ) : (
+                <Button size="sm" variant="secondary" disabled className="h-8 px-4 text-xs rounded-xl font-bold bg-gray-100 text-gray-400">
+                  Unavailable
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </CardContent>
