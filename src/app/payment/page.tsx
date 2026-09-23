@@ -141,7 +141,39 @@ function PaymentContent() {
                 <div className="w-full border-t border-gray-200"></div>
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="bg-white px-4 text-gray-400 font-bold bg-[var(--color-cream)] px-2">OR</span>
+                <span className="bg-white px-4 text-gray-400 font-bold bg-[var(--color-cream)] px-2">OR PAY VIA NEFT/IMPS</span>
+              </div>
+            </div>
+
+            {/* Bank Details */}
+            <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
+              <h3 className="font-bold text-[var(--color-navy)] mb-3 text-sm">Bank Account Details</h3>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Name</span>
+                  <span className="font-bold text-[var(--color-navy)]">Ashish Prem Chandra Yadav</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">A/C Number</span>
+                  <span className="font-bold text-[var(--color-navy)] tracking-wider">4446340096</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">IFSC Code</span>
+                  <span className="font-bold text-[var(--color-navy)]">KKBK0001404</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Bank</span>
+                  <span className="font-bold text-[var(--color-navy)]">Kotak Mahindra Bank</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-gray-200"></div>
+              </div>
+              <div className="relative flex justify-center text-sm">
+                <span className="bg-white px-4 text-gray-400 font-bold bg-[var(--color-cream)] px-2">VERIFY</span>
               </div>
             </div>
 
@@ -154,8 +186,8 @@ function PaymentContent() {
 
             {/* Verification Form */}
             <form onSubmit={handleVerify} className="bg-gray-50 p-5 rounded-2xl border border-gray-200 mt-6">
-              <h3 className="font-bold text-[var(--color-navy)] mb-1">Verify Payment</h3>
-              <p className="text-xs text-gray-500 mb-4">After paying, enter the 12-digit UTR / UPI Reference Number below.</p>
+              <h3 className="font-bold text-[var(--color-navy)] mb-1">Confirm Payment</h3>
+              <p className="text-xs text-gray-500 mb-4">Enter the 12-digit UTR / Reference No. to send your order to the kitchen.</p>
               
               <Input 
                 placeholder="e.g. 320145890123" 
