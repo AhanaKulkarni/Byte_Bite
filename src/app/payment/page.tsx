@@ -136,49 +136,8 @@ function PaymentContent() {
               </div>
             </div>
 
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="bg-white px-4 text-gray-400 font-bold bg-[var(--color-cream)] px-2">OR PAY VIA NEFT/IMPS</span>
-              </div>
-            </div>
-
-            {/* Bank Details */}
-            <div className="bg-blue-50/50 p-4 rounded-2xl border border-blue-100">
-              <h3 className="font-bold text-[var(--color-navy)] mb-3 text-sm">Bank Account Details</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Name</span>
-                  <span className="font-bold text-[var(--color-navy)]">Ashish Prem Chandra Yadav</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">A/C Number</span>
-                  <span className="font-bold text-[var(--color-navy)] tracking-wider">4446340096</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">IFSC Code</span>
-                  <span className="font-bold text-[var(--color-navy)]">KKBK0001404</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Bank</span>
-                  <span className="font-bold text-[var(--color-navy)]">Kotak Mahindra Bank</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="bg-white px-4 text-gray-400 font-bold bg-[var(--color-cream)] px-2">VERIFY</span>
-              </div>
-            </div>
-
             {/* Mobile Auto-Open Button */}
-            <a href={upiLink} className="block">
+            <a href={upiLink} className="block mt-6">
               <Button className="w-full h-14 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold text-lg shadow-lg shadow-green-500/20 active:scale-95 transition-transform rounded-xl">
                 Pay Using GPay / PhonePe
               </Button>
