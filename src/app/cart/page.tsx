@@ -7,6 +7,7 @@ import { ArrowLeft, Clock, Info, Minus, Plus, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { useCart } from '@/lib/CartContext';
+import { supabase } from '@/lib/supabase';
 
 const PICKUP_TIMES = [
   'ASAP',
@@ -28,11 +29,58 @@ export default function CartPage() {
   const discount = cartItems.length > 0 ? 0 : 0; // Removing fake discount
   const total = subtotal - discount;
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     setIsLoading(true);
-    setTimeout(() => {
-      router.push(`/payment?amount=${total}&orderId=025`);
-    }, 1000);
+    
+    try {
+      // 1. Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        alert("Please login to place an order");
+        router.push('/auth/login');
+        return;
+      }
+
+      // 2. Insert Order
+      const { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: user.id,
+          stall_id: cartItems[0].stallId, // Assuming all items from same stall for MVP
+          total_amount: total,
+          pickup_time: selectedTime,
+          status: 'pending',
+          payment_status: 'pending'
+        })
+        .select()
+        .single();
+
+      if (orderError) throw orderError;
+
+      // 3. Insert Order Items
+      const orderItemsToInsert = cartItems.map(item => ({
+        order_id: orderData.id,
+        menu_item_id: item.menuItemId,
+        quantity: item.quantity,
+        price_at_time: item.price,
+        variant_name: item.variantName || null
+      }));
+
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItemsToInsert);
+
+      if (itemsError) throw itemsError;
+
+      // 4. Redirect to payment page with the real Order ID
+      router.push(`/payment?orderId=${orderData.id}`);
+      
+    } catch (error) {
+      console.error("Checkout failed:", error);
+      alert("Failed to place order. Please try again.");
+      setIsLoading(false);
+    }
   };
 
   return (
