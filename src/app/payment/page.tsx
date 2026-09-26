@@ -70,16 +70,14 @@ function PaymentContent() {
     setTimeout(() => setIsCopied(false), 2000);
   };
 
-  const handleVerify = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleVerify = async () => {
     setSubmitting(true);
     
     try {
       const { error } = await supabase
         .from('orders')
         .update({ 
-          payment_status: 'verifying',
-          utr_number: utrNumber
+          payment_status: 'verifying'
         })
         .eq('id', order.id);
 
@@ -88,8 +86,7 @@ function PaymentContent() {
       // Clear the cart now that order is placed and payment submitted
       clearCart();
       
-      // Redirect to a success/tracking page (we'll create this later, routing to home for now)
-      alert("Payment submitted! The cafe will verify it and prepare your order.");
+      alert("Order sent to kitchen! Please wait while we verify your payment.");
       router.push('/profile'); // Go to profile to see orders
       
     } catch (err) {
@@ -143,25 +140,15 @@ function PaymentContent() {
               </Button>
             </a>
 
-            {/* Verification Form */}
-            <form onSubmit={handleVerify} className="bg-gray-50 p-5 rounded-2xl border border-gray-200 mt-6">
-              <h3 className="font-bold text-[var(--color-navy)] mb-1">Confirm Payment</h3>
-              <p className="text-xs text-gray-500 mb-4">Enter the 12-digit UTR / Reference No. to send your order to the kitchen.</p>
+            {/* Honor System Button */}
+            <div className="bg-gray-50 p-5 rounded-2xl border border-gray-200 mt-6 text-center">
+              <h3 className="font-bold text-[var(--color-navy)] mb-1">Done paying?</h3>
+              <p className="text-xs text-gray-500 mb-4">Click below once you've made the payment.</p>
               
-              <Input 
-                placeholder="e.g. 320145890123" 
-                value={utrNumber}
-                onChange={(e) => setUtrNumber(e.target.value.replace(/[^0-9]/g, '').slice(0, 12))}
-                className="h-12 bg-white mb-3 tracking-widest font-mono text-center"
-                required
-                minLength={12}
-                maxLength={12}
-              />
-              
-              <Button type="submit" disabled={submitting || utrNumber.length < 12} className="w-full h-12 bg-[var(--color-navy)] hover:bg-blue-900 rounded-xl font-bold">
-                {submitting ? 'Submitting...' : 'Submit to Kitchen'}
+              <Button onClick={handleVerify} disabled={submitting} className="w-full h-12 bg-[var(--color-navy)] hover:bg-blue-900 rounded-xl font-bold">
+                {submitting ? 'Sending to Kitchen...' : 'I Have Paid'}
               </Button>
-            </form>
+            </div>
 
           </CardContent>
         </Card>

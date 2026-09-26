@@ -75,7 +75,7 @@ export default function Home() {
                       <p className="text-sm md:text-base text-gray-500 mb-3">{stall.description || 'Campus Café'}</p>
                       
                       <div className="flex items-center gap-2 text-xs md:text-sm font-bold">
-                        {stall.is_active ? (
+                        {stall.is_open ? (
                           <span className="flex items-center gap-1.5 text-[var(--color-fresh-green)] bg-green-50 px-2.5 py-1 rounded-md">
                             <span className="w-2 h-2 rounded-full bg-[var(--color-fresh-green)] animate-pulse" />
                             Open
