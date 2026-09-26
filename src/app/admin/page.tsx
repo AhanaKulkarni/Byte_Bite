@@ -5,7 +5,6 @@ import { supabase } from '@/lib/supabase';
 import { Card, CardContent } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
 import { useRouter } from 'next/navigation';
-import { Badge } from '@/components/ui/Badge';
 
 export default function AdminDashboard() {
   const [orders, setOrders] = useState<any[]>([]);
@@ -169,9 +168,9 @@ export default function AdminDashboard() {
                     {/* Payment Status Bar */}
                     <div className="flex items-center justify-between bg-white p-3 rounded-lg border border-gray-200">
                       <span className="text-xs font-bold text-gray-500 uppercase tracking-wide">Payment</span>
-                      {order.payment_status === 'pending' && <Badge className="bg-gray-200 text-gray-700">Not Paid</Badge>}
-                      {order.payment_status === 'verifying' && <Badge className="bg-yellow-100 text-yellow-800">Verifying</Badge>}
-                      {order.payment_status === 'paid' && <Badge className="bg-green-100 text-green-800 border border-green-200">Paid ✓</Badge>}
+                      {order.payment_status === 'pending' && <span className="px-2 py-1 text-xs font-bold rounded-md bg-gray-200 text-gray-700">Not Paid</span>}
+                      {order.payment_status === 'verifying' && <span className="px-2 py-1 text-xs font-bold rounded-md bg-yellow-100 text-yellow-800">Verifying</span>}
+                      {order.payment_status === 'paid' && <span className="px-2 py-1 text-xs font-bold rounded-md bg-green-100 text-green-800 border border-green-200">Paid ✓</span>}
                     </div>
 
                     {/* Action Buttons based on state */}
